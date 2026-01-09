@@ -1,5 +1,6 @@
 import React from 'react';
 import { Home, Search, ShoppingCart, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 
 export default function Navbar() {
@@ -36,7 +37,10 @@ export default function Navbar() {
               <ShoppingCart className="w-5 h-5 text-gray-700" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <Link to="account" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <User className="w-5 h-5 text-gray-700" />
+            </Link >
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors hidden">
               <User className="w-5 h-5 text-gray-700" />
             </button>
           </div>
