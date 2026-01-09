@@ -1,6 +1,8 @@
 import React from "react";
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User, Phone, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
+import logo from "../../public/logo1.png"
 
 export default function Account() {
     const [isLogin, setIsLogin] = useState(true);
@@ -37,6 +39,11 @@ export default function Account() {
     };
 
     return (
+      <section>
+        <Link to='/'>
+        <img src={logo} alt="logo to home" width={200} />
+        </Link>
+
         <div className="min-h-screen  flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 {/* Header */}
@@ -68,7 +75,7 @@ export default function Account() {
                             onClick={() => setIsLogin(false)}
                             className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${
                                 !isLogin
-                                    ? "bg-white text-amber-600 shadow-sm"
+                                    ? "bg-white text-black shadow-sm"
                                     : "text-gray-600 hover:text-gray-900"
                             }`}
                         >
@@ -148,33 +155,12 @@ export default function Account() {
                                 </button>
                             </div>
 
-                            {!isLogin && (
-                                /* Confirm Password */
-                                <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                    <input
-                                        type={showConfirmPassword ? "text" : "password"}
-                                        name="confirmPassword"
-                                        placeholder="Confirm Password"
-                                        value={formData.confirmPassword}
-                                        onChange={handleInputChange}
-                                        className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
-                                        required={!isLogin}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                                    >
-                                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                    </button>
-                                </div>
-                            )}
+  
 
                             {/* Submit Button */}
                             <button
                                 type="submit"
-                                className="w-full bg-black text-white py-3 rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                                className="w-full bg-black text-white py-3 rounded-xl font-semibold hover:from-black hover:to-amber-700 transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
                             >
                                 {isLogin ? "Sign In" : "Create Account"}
                             </button>
@@ -198,12 +184,6 @@ export default function Account() {
                                 </svg>
                                 Continue with Google
                             </button>
-                            <button className="w-full flex items-center justify-center py-3 px-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200">
-                                <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                                </svg>
-                                Continue with Twitter
-                            </button>
                         </div>
 
                         {/* Footer Links */}
@@ -213,7 +193,7 @@ export default function Account() {
                                     Don't have an account?{" "}
                                     <button
                                         onClick={() => setIsLogin(false)}
-                                        className="text-amber-600 hover:text-amber-700 font-semibold transition-colors"
+                                        className="text-black hover:text-amber-700 font-semibold transition-colors"
                                     >
                                         Sign up
                                     </button>
@@ -223,7 +203,7 @@ export default function Account() {
                                     Already have an account?{" "}
                                     <button
                                         onClick={() => setIsLogin(true)}
-                                        className="text-amber-600 hover:text-amber-700 font-semibold transition-colors"
+                                        className="text-black hover:text-amber-700 font-semibold transition-colors"
                                     >
                                         Sign in
                                     </button>
@@ -231,7 +211,7 @@ export default function Account() {
                             )}
                             {isLogin && (
                                 <p className="text-sm text-gray-600 mt-2">
-                                    <button className="text-amber-600 hover:text-amber-700 font-semibold transition-colors">
+                                    <button className="text-black hover:text-amber-700 font-semibold transition-colors">
                                         Forgot password?
                                     </button>
                                 </p>
@@ -243,11 +223,12 @@ export default function Account() {
                 {/* Footer */}
                 <p className="text-center text-xs text-gray-500 mt-8">
                     By signing up, you agree to our{" "}
-                    <a href="#" className="text-amber-600 hover:text-amber-700">Terms of Service</a>{" "}
+                    <a href="#" className="text-black hover:text-amber-700">Terms of Service</a>{" "}
                     and{" "}
-                    <a href="#" className="text-amber-600 hover:text-amber-700">Privacy Policy</a>
+                    <a href="#" className="text-black hover:text-amber-700">Privacy Policy</a>
                 </p>
             </div>
         </div>
+      </section>
     );
 }
