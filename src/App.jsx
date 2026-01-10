@@ -3,10 +3,13 @@ import { Toaster } from 'react-hot-toast';
 import Home from "../src/pages/Home";
 import Account from "../src/pages/Login"; // Assuming your Login/Signup is here
 import Dashboard from '../src/pages/Dashboard';
+import Cart from '../src/pages/Cart';
 // import ProtectedRoute from './components/ProtectedRoute';
+import { CartProvider } from './context/CartContext';
 
 function App() {
   return (
+    <CartProvider>
     <BrowserRouter>
       {/* 1. Toaster is placed outside Routes so it's available everywhere */}
       <Toaster 
@@ -33,8 +36,10 @@ function App() {
             // </ProtectedRoute>
           } 
         />
+        <Route path='/cart' element={<Cart />} />
       </Routes>
     </BrowserRouter>
+    </CartProvider>
   );
 }
 
