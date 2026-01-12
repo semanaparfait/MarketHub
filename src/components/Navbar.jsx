@@ -60,17 +60,21 @@ export default function Navbar() {
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-gray-600 hover:text-black transition-colors text-sm font-medium">Home</Link>
-            <Link to="/rewards" className="text-gray-600 hover:text-black transition-colors text-sm font-medium">Rewards</Link>
+            <Link to="/aboutus" className="text-gray-600 hover:text-black transition-colors text-sm font-medium">About us</Link>
+          <Link to="/Contact" className="text-gray-600 hover:text-black transition-colors text-sm font-medium">Contact us</Link>
           </div>
 
           {/* Right Section */}
           <div className="flex items-center space-x-3">
             <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
               <CakeSliceIcon className="w-5 h-5 text-gray-700" />
+              </button>
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors hidden">
+              <Search className="w-5 h-5 text-gray-700" />
             </button>
             
             {/* 4. Updated Cart Icon with Badge */}
-            <Link to="/cart" className="p-2 hover:bg-gray-100 rounded-full transition-colors relative group">
+            <Link to="/cart" title='Cart' className="p-2 hover:bg-gray-100 rounded-full transition-colors relative group">
               <ShoppingCart className="w-5 h-5 text-gray-700 group-hover:text-black" />
               {cartCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white animate-in zoom-in">
