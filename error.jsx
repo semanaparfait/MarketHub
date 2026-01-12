@@ -3,7 +3,7 @@ import { X, AlertCircle } from 'lucide-react';
 
 export default function ErrorPage() {
   const handleOkay = () => {
-    console.log('Okay clicked');
+    console.log('Okay clicked'); 
   };
 
   const handleClose = () => {
