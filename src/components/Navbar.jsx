@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Search, ShoppingCart, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
+import { Home, Search, ShoppingCart, User, LogOut, LayoutDashboard, ChevronDown, CakeSliceIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -66,7 +66,7 @@ export default function Navbar() {
           {/* Right Section */}
           <div className="flex items-center space-x-3">
             <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-              <Search className="w-5 h-5 text-gray-700" />
+              <CakeSliceIcon className="w-5 h-5 text-gray-700" />
             </button>
             
             {/* 4. Updated Cart Icon with Badge */}
@@ -78,6 +78,7 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
+            
 
             <div className="border-l border-gray-200 h-6 mx-2"></div>
 
