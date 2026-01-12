@@ -35,7 +35,7 @@ export default function Account() {
                 const response = await axios.post("https://dummyjson.com/user/login", {
                     username: formData.email, 
                     password: formData.password,
-                    expiresInMins: 30
+                    expiresInMins: 7
                 });
 
                 localStorage.setItem("token", response.data.accessToken);
