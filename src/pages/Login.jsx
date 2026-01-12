@@ -35,18 +35,17 @@ export default function Account() {
                 const response = await axios.post("https://dummyjson.com/user/login", {
                     username: formData.email, 
                     password: formData.password,
-                    expiresInMins: 30
+                    expiresInMins: 7
                 });
-
-                localStorage.setItem("token", response.data.accessToken);
-                localStorage.setItem("user", JSON.stringify(response.data));
-                
-                // Replace alert with toast.success
-                toast.success(`Welcome back, ${response.data.firstName}!`);
-                navigate("/");
-                // navigate("/dashboard");
+                if(response.data.role !== 'admin') {
+                    localStorage.setItem("token", response.data.accessToken);
+                    localStorage.setItem("user", JSON.stringify(response.data));
+                    toast.success(`Welcome back, ${response.data.firstName}!`);
+                    navigate("/");
+                } else {
+                    navigate("/AdminDashboard");
+                }
             } catch (err) {
-                // Replace alert with toast.error
                 toast.error("Login Failed. Please use 'emilys' / 'emilyspass'");
             } finally {
                 setLoginLoading(false);

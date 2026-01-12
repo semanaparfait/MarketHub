@@ -1,19 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, Package, FolderOpen, Plus, Edit2, Trash2, X, Search } from 'lucide-react';
+import axios from 'axios';
 
 const AdminDashboard = () => {
-  // Initial data
-  const [users, setUsers] = useState([
-    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Active' },
-    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'User', status: 'Inactive' },
-  ]);
+  // API data states
+  const [users, setUsers] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Laptop', category: 'Electronics', price: 999, stock: 50 },
-    { id: 2, name: 'Office Chair', category: 'Furniture', price: 199, stock: 30 },
-    { id: 3, name: 'Notebook', category: 'Stationery', price: 5, stock: 200 },
-  ]);
+  // Fetch users and products from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [usersRes, productsRes] = await Promise.all([
+          axios.get('https://dummyjson.com/users'),
+          axios.get('https://dummyjson.com/products')
+        ]);
+        
+        setUsers(usersRes.data.users || []);
+        setProducts(productsRes.data.products || []);
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch data from server');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const [categories, setCategories] = useState([
     { id: 1, name: 'Electronics', description: 'Electronic devices and accessories', count: 1 },
@@ -104,18 +122,22 @@ const AdminDashboard = () => {
   };
 
   // Filter data based on search
-  const filteredUsers = users.filter(u => 
-    u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = users.filter(u => {
+    const fullName = `${u.firstName || ''} ${u.lastName || ''}`.toLowerCase();
+    const email = (u.email || '').toLowerCase();
+    return fullName.includes(searchTerm.toLowerCase()) || 
+           email.includes(searchTerm.toLowerCase());
+  });
 
-  const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = products.filter(p => {
+    const title = (p.title || '').toLowerCase();
+    const category = (p.category || '').toLowerCase();
+    return title.includes(searchTerm.toLowerCase()) || 
+           category.includes(searchTerm.toLowerCase());
+  });
 
   const filteredCategories = categories.filter(c =>
-    c.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (c.name || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -127,7 +149,23 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Loading State */}
+      {loading && (
+        <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+          <p className="text-gray-500 text-lg animate-pulse">Loading data...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {error}
+          </div>
+        </div>
+      )}
+
+      {!loading && !error && (
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-lg shadow">
@@ -235,14 +273,12 @@ const AdminDashboard = () => {
                   <tbody>
                     {filteredUsers.map((user) => (
                       <tr key={user.id} className="border-b hover:bg-gray-50">
-                        <td className="py-3 px-4">{user.name}</td>
+                        <td className="py-3 px-4">{user.firstName} {user.lastName}</td>
                         <td className="py-3 px-4">{user.email}</td>
-                        <td className="py-3 px-4">{user.role}</td>
+                        <td className="py-3 px-4">{user.role || 'User'}</td>
                         <td className="py-3 px-4">
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {user.status}
+                          <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                            Active
                           </span>
                         </td>
                         <td className="py-3 px-4 text-right">
@@ -275,17 +311,17 @@ const AdminDashboard = () => {
                       <th className="text-left py-3 px-4 font-semibold text-sm text-gray-600">Name</th>
                       <th className="text-left py-3 px-4 font-semibold text-sm text-gray-600">Category</th>
                       <th className="text-left py-3 px-4 font-semibold text-sm text-gray-600">Price</th>
-                      <th className="text-left py-3 px-4 font-semibold text-sm text-gray-600">Stock</th>
+                      <th className="text-left py-3 px-4 font-semibold text-sm text-gray-600">Rating</th>
                       <th className="text-right py-3 px-4 font-semibold text-sm text-gray-600">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredProducts.map((product) => (
                       <tr key={product.id} className="border-b hover:bg-gray-50">
-                        <td className="py-3 px-4">{product.name}</td>
+                        <td className="py-3 px-4">{product.title}</td>
                         <td className="py-3 px-4">{product.category}</td>
                         <td className="py-3 px-4">${product.price}</td>
-                        <td className="py-3 px-4">{product.stock}</td>
+                        <td className="py-3 px-4">⭐ {product.rating || 'N/A'}</td>
                         <td className="py-3 px-4 text-right">
                           <button
                             onClick={() => openModal('products', product)}
@@ -348,6 +384,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Modal */}
       {showModal && (
