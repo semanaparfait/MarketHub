@@ -36,21 +36,28 @@ export default function Dashboard() {
         const formData = new FormData(e.target);
         
         const newProduct = {
+            id: Date.now(),
             title: formData.get("title"),
             price: parseFloat(formData.get("price")),
             description: formData.get("description") || "No description provided",
-            category: "electronics",
-            thumbnail: "https://via.placeholder.com/150",
+            category: formData.get("category") || "electronics",
+            thumbnail: formData.get("thumbnail") || "https://via.placeholder.com/150",
             stock: 10,
             rating: 5.0
         };
 
         const loadToast = toast.loading("Adding to MarketHub...");
         try {
+            // Save to localStorage
+            const existingProducts = JSON.parse(localStorage.getItem("marketHub_products")) || [];
+            existingProducts.push(newProduct);
+            localStorage.setItem("marketHub_products", JSON.stringify(existingProducts));
+            
             // Simulated POST request
             await createItem(newProduct);
             toast.success("Product added to view!", { id: loadToast });
             setShowAddModal(false);
+            e.target.reset();
         } catch {
             toast.error("Failed to add product", { id: loadToast });
         }
@@ -215,14 +222,26 @@ export default function Dashboard() {
                         <h2 className="text-3xl font-black mb-1 text-gray-900 leading-tight">New Listing</h2>
                         <p className="text-gray-400 mb-8 font-medium">Add a fresh item to your digital storefront.</p>
                         
-                        <form onSubmit={handleAddProduct} className="space-y-6">
+                        <form onSubmit={handleAddProduct} className="space-y-3">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] ml-2">Product Title</label>
-                                <input name="title" required placeholder="e.g. Vintage Leather Jacket" className="w-full p-4 bg-gray-50 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-black outline-none" />
+                                <input name="title" required placeholder="e.g. Virunga Gold" className="w-full p-2 bg-gray-50 rounded border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-black outline-none" />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] ml-2">Price ($)</label>
-                                <input name="price" type="number" step="0.01" required placeholder="0.00" className="w-full p-4 bg-gray-50 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-black outline-none" />
+                                <input name="price" type="number"  min={1} required placeholder="0.00" className="w-full p-2 bg-gray-50 rounded border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-black outline-none" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] ml-2">Product Category</label>
+                                <input name="category" required placeholder="e.g. electronics/shoes" className="w-full p-2 bg-gray-50 rounded border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-black outline-none" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] ml-2">Product Description</label>
+                               <textarea name="description" id="description" className="w-full resize-none p-4 bg-gray-50 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-black outline-none" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] ml-2">Product Title</label>
+                                <input name="thumbnail" required placeholder="e.g. https://" className="w-full p-2 bg-gray-50 rounded border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-black outline-none" />
                             </div>
                             <button type="submit" className="w-full bg-black text-white py-4 rounded-3xl font-bold text-lg hover:bg-gray-800 shadow-2xl active:scale-95 transition-all">
                                 Publish Product
