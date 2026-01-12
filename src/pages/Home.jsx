@@ -14,11 +14,24 @@ function Home() {
   useEffect(() => {
     axios.get('https://dummyjson.com/products')
       .then((response) => {
-        setProducts(response.data.products);
+        // Get products from API
+        let apiProducts = response.data.products;
+        
+        // Get custom products from localStorage
+        const localStorageProducts = JSON.parse(localStorage.getItem('marketHub_products')) || [];
+        
+        // Combine API products with localStorage products
+        const allProducts = [...apiProducts, ...localStorageProducts];
+        
+        setProducts(allProducts);
         setLoading(false);
       })
       .catch((error) => {
         setError("Could not connect to the server.");
+        
+        // Still load localStorage products if API fails
+        const localStorageProducts = JSON.parse(localStorage.getItem('marketHub_products')) || [];
+        setProducts(localStorageProducts);
         setLoading(false);
       });
   }, []);
