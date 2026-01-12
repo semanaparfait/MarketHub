@@ -197,14 +197,21 @@ function Home() {
                    <span className="text-xl font-black">${product.price}</span>
                    <span className="text-xs text-gray-400">⭐ {product.rating}</span>
                 </div>
-                <div className="flex gap-2 mt-auto">
+                <div className="flex gap-2 mt-auto cursor-pointer">
                   <button 
                     onClick={() => handleAddToCart(product)} // Call function here
-                    className="flex-1 bg-black text-white text-xs font-bold py-3 rounded-xl hover:bg-gray-800 transition active:scale-95"
+                    className="flex-1 cursor-progress bg-black text-white text-xs font-bold py-3 rounded-xl hover:bg-gray-800 transition active:scale-95"
                   >
                     Add to Cart
                   </button>
-                  <button className="p-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition"><Tag size={18} className="text-gray-600"/></button>
+                  <button 
+                    onClick={() => handleAddToCart(product)} // Call function here
+                    className="flex-1 cursor-progress bg-gray-100 text-gray-700 text-xs font-bold py-3 rounded-xl hover:bg-gray-200 transition active:scale-95"
+                    // className="flex-1 bg-black text-white text-xs font-bold py-3 rounded-xl hover:bg-gray-800 transition active:scale-95"
+                  >
+                    Add to Wishlist
+                  </button>
+                  {/* <button className="p-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition"><Tag size={18} className="text-gray-600"/></button> */}
                 </div>
               </div>
             </div>

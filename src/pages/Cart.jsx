@@ -7,14 +7,12 @@ import toast from 'react-hot-toast';
 
 export default function Cart() {
     const [cartItems, setCartItems] = useState([]);
-
-    // 1. Load cart items from localStorage on mount
     useEffect(() => {
         const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
         setCartItems(savedCart);
     }, []);
 
-    // 2. Remove Item Function
+    //  Remove Item From cart localstorage
     const removeItem = (cartId) => {
         const updatedCart = cartItems.filter(item => item.cartId !== cartId);
         setCartItems(updatedCart);
@@ -22,7 +20,7 @@ export default function Cart() {
         toast.error("Item removed from cart");
     };
 
-    // 3. Calculate Total Price
+//  Calculating Total Price of all carts
     const totalPrice = cartItems.reduce((acc, item) => acc + item.price, 0).toFixed(2);
 
     return (
