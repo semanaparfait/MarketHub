@@ -5,6 +5,7 @@ import Account from "../src/pages/Login"; // Assuming your Login/Signup is here
 import Dashboard from '../src/pages/Dashboard';
 import Cart from '../src/pages/Cart';
 import Contact from '../src/pages/Contact';
+import AdminDashboard from '../src/pages/AdminDashboard';
 // import ProtectedRoute from './components/ProtectedRoute';
 import { CartProvider } from './context/CartContext';
 
@@ -39,6 +40,7 @@ function App() {
         />
         <Route path='/cart' element={<Cart />} />
         <Route path='/Contact' element={<Contact />} />
+        <Route path='/AdminDashboard' element={<AdminDashboard />} />
       </Routes>
     </BrowserRouter>
     </CartProvider>
