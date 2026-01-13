@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function ErrorPage() {
   const handleOkay = () => {
@@ -48,12 +49,14 @@ export default function ErrorPage() {
           <div className="w-8 h-1 bg-white/40 rounded mb-6"></div>
 
           {/* Okay button */}
+          <Link to="/">
           <button
             onClick={handleOkay}
             className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-lg transition-colors uppercase tracking-wider"
           >
             Okay
           </button>
+          </Link>
         </div>
 
         {/* Decorative elements */}
