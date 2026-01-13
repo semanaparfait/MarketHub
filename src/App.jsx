@@ -8,6 +8,7 @@ import Contact from '../src/pages/Contact';
 import AdminDashboard from '../src/pages/AdminDashboard';
 // import ProtectedRoute from './components/ProtectedRoute';
 import { CartProvider } from './context/CartContext';
+import Wishlist from './pages/Wishlist';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
         <Route path='/cart' element={<Cart />} />
         <Route path='/Contact' element={<Contact />} />
         <Route path='/AdminDashboard' element={<AdminDashboard />} />
+        <Route path='/wishlist' element={ <Wishlist />} />
       </Routes>
     </BrowserRouter>
     </CartProvider>

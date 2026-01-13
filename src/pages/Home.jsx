@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import axios from 'axios'
-import { Sparkles, Tag, ShoppingCart, Filter, X, ChevronDown } from 'lucide-react'
-import toast from 'react-hot-toast' // 1. Import toast
+import { Sparkles, Tag, ShoppingCart, Filter, X, ChevronDown, HeartIcon } from 'lucide-react'
+import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
+import { useCart } from '../context/CartContext'
 
 function Home() {
+  const navigate = useNavigate();
+  const { toggleWishlist } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -62,8 +66,25 @@ function Home() {
     }
   }, [products]);
 
-  // 2. Add to Cart Function with Toaster
+  // 2. Add to Cart Function with Authentication Check
   const handleAddToCart = (product) => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    
+    if (!token || !user) {
+      // User is not logged in, ask if they want to login
+      const shouldLogin = window.confirm('You need to login to add items to cart. Do you want to login now?');
+      
+      if (shouldLogin) {
+        // Redirect to login page
+        navigate('/account');
+      }
+      // If no, just return and stay on home page
+      return;
+    }
+
+    // User is logged in, proceed with adding to cart
     // Get existing cart from localStorage or empty array
     const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
     
@@ -121,6 +142,11 @@ function Home() {
     
     return true;
   });
+
+  // Add to Wishlist Function
+  const handleAddToWishlist = (product) => {
+    toggleWishlist(product);
+  };
 
   // Reset filters
   const resetFilters = () => {
@@ -566,7 +592,13 @@ function Home() {
                       >
                         Add to Cart
                       </button>
-                      <button className="p-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition">
+                        <button 
+                        onClick={() => handleAddToWishlist(product)}
+                        className="px-3 ring  text-black text-xs font-bold py-3 rounded-xl hover:bg-gray-800 transition active:scale-95"
+                      >
+                        <HeartIcon size={16} className="mx-auto" />
+                      </button>
+                      <button className="p-3 hidden border border-gray-200 rounded-xl hover:bg-gray-50 transition">
                         <Tag size={18} className="text-gray-600" />
                       </button>
                     </div>
