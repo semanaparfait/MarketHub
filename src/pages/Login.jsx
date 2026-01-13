@@ -86,6 +86,19 @@ export default function Account() {
                 } else {
                     toast.error("Invalid credentials. Try 'emilys' / 'emilyspass' or sign up first.");
                 }
+                const response = await axios.post("https://dummyjson.com/user/login", {
+                    username: formData.email, 
+                    password: formData.password,
+                    expiresInMins: 7
+                });
+
+                localStorage.setItem("token", response.data.accessToken);
+                localStorage.setItem("user", JSON.stringify(response.data));
+                
+                // Replace alert with toast.success
+                toast.success(`Welcome back, ${response.data.firstName}!`);
+                navigate("/");
+                // navigate("/dashboard");
             } catch (err) {
                 console.error("Login error:", err);
                 toast.error("Login failed. Please try again.");
