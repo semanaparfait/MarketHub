@@ -38,12 +38,13 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.clear();
     setUserData(null);
     setIsOpen(false);
     toast.success("Logged out successfully");
-    navigate("/");
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   return (
@@ -66,9 +67,9 @@ export default function Navbar() {
 
           {/* Right Section */}
           <div className="flex items-center space-x-3">
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <Link to="/wishlist" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
               <CakeSliceIcon className="w-5 h-5 text-gray-700" />
-              </button>
+              </Link>
             <button className="p-2 hover:bg-gray-100 rounded-full transition-colors hidden">
               <Search className="w-5 h-5 text-gray-700" />
             </button>

@@ -13,20 +13,31 @@ export default function Dashboard() {
     // --- State Management ---
     const [currentView, setCurrentView] = useState("products"); 
     const [showAddModal, setShowAddModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [editingProduct, setEditingProduct] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || {});
+    const [localProducts, setLocalProducts] = useState([]);
 
     // --- CRUD Logic ---
     const { data, loading, fetchAll, deleteItem, createItem, updateItem } = useAxiosCRUD("/products");
 
     useEffect(() => {
         fetchAll();
+        loadLocalProducts();
     }, []);
 
-    // Filter local list for search UX
-    const productsList = data?.products || data || [];
-    const filteredProducts = productsList.filter(p => 
+    const loadLocalProducts = () => {
+        const products = JSON.parse(localStorage.getItem("marketHub_products")) || [];
+        setLocalProducts(products);
+    };
+
+    // Combine API and local products
+    const apiProducts = data?.products || data || [];
+    const allProducts = [...apiProducts, ...localProducts];
+
+    const filteredProducts = allProducts.filter(p => 
         p.title?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -43,23 +54,91 @@ export default function Dashboard() {
             category: formData.get("category") || "electronics",
             thumbnail: formData.get("thumbnail") || "https://via.placeholder.com/150",
             stock: 10,
-            rating: 5.0
+            rating: 5.0,
+            isLocal: true
         };
 
-        const loadToast = toast.loading("Adding to MarketHub...");
+        toast.dismiss();
+        const loadToast = toast.loading("Adding product...");
         try {
             // Save to localStorage
             const existingProducts = JSON.parse(localStorage.getItem("marketHub_products")) || [];
             existingProducts.push(newProduct);
             localStorage.setItem("marketHub_products", JSON.stringify(existingProducts));
-            
-            // Simulated POST request
-            await createItem(newProduct);
-            toast.success("Product added to view!", { id: loadToast });
+
+            // Update local state
+            setLocalProducts(existingProducts);
+
+            toast.success("Product added successfully!", { id: loadToast });
             setShowAddModal(false);
             e.target.reset();
         } catch {
             toast.error("Failed to add product", { id: loadToast });
+        }
+    };
+
+    const handleEditProduct = (product) => {
+        setEditingProduct(product);
+        setShowEditModal(true);
+    };
+
+    const handleUpdateProduct = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        
+        const updatedProduct = {
+            ...editingProduct,
+            title: formData.get("title"),
+            price: parseFloat(formData.get("price")),
+            description: formData.get("description"),
+            category: formData.get("category"),
+            thumbnail: formData.get("thumbnail"),
+        };
+
+        toast.dismiss();
+        const loadToast = toast.loading("Updating product...");
+        
+        try {
+            if (editingProduct.isLocal || editingProduct.id > 1000000000000) {
+                const products = JSON.parse(localStorage.getItem("marketHub_products")) || [];
+                const updatedProducts = products.map(p => p.id === editingProduct.id ? updatedProduct : p);
+                localStorage.setItem("marketHub_products", JSON.stringify(updatedProducts));
+                setLocalProducts(updatedProducts);
+                toast.success("Product updated successfully!", { id: loadToast });
+            } else {
+                await updateItem(editingProduct.id, updatedProduct);
+                await fetchAll();
+                toast.success("Product updated successfully!", { id: loadToast });
+            }
+
+            setShowEditModal(false);
+            setEditingProduct(null);
+        } catch (err) {
+            toast.error("Failed to update product", { id: loadToast });
+        }
+    };
+
+    const handleDeleteProduct = async (product) => {
+        const confirmed = window.confirm(`Delete "${product.title}"?`);
+        if (!confirmed) return;
+
+        toast.dismiss();
+        const loadToast = toast.loading("Deleting product...");
+        
+        try {
+            if (product.isLocal || product.id > 1000000000000) {
+                const products = JSON.parse(localStorage.getItem("marketHub_products")) || [];
+                const updatedProducts = products.filter(p => p.id !== product.id);
+                localStorage.setItem("marketHub_products", JSON.stringify(updatedProducts));
+                setLocalProducts(updatedProducts);
+                toast.success("Product deleted successfully!", { id: loadToast });
+            } else {
+                await deleteItem(product.id);
+                await fetchAll();
+                toast.success("Product deleted successfully!", { id: loadToast });
+            }
+        } catch (err) {
+            toast.error("Failed to delete product", { id: loadToast });
         }
     };
 
@@ -97,13 +176,13 @@ export default function Dashboard() {
                 <nav className="space-y-2 flex-1">
                     <button 
                         onClick={() => setCurrentView("products")}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition ${currentView === "products" ? 'bg-amber-500 text-black font-bold' : 'text-gray-400 hover:bg-gray-900'}`}
+                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition ${currentView === "products" ? 'bg-white text-black font-bold' : 'text-gray-400 hover:bg-gray-900'}`}
                     >
                         <LayoutDashboard size={20} /> <span>Inventory</span>
                     </button>
                     <button 
                         onClick={() => setCurrentView("profile")}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition ${currentView === "profile" ? 'bg-amber-500 text-black font-bold' : 'text-gray-400 hover:bg-gray-900'}`}
+                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition ${currentView === "profile" ? 'bg-white text-black font-bold' : 'text-gray-400 hover:bg-gray-900'}`}
                     >
                         <User size={20} /> <span>My Profile</span>
                     </button>
@@ -155,19 +234,21 @@ export default function Dashboard() {
                                     <tbody className="divide-y divide-gray-50">
                                         {loading ? (
                                             <tr><td colSpan="3" className="text-center py-20 text-gray-400 animate-pulse">Syncing catalog...</td></tr>
-                                        ) : filteredProducts.map((product) => (
+                                        ) : filteredProducts.length > 0 ? filteredProducts.map((product) => (
                                             <tr key={product.id} className="hover:bg-gray-50/80 transition-colors group">
                                                 <td className="px-8 py-5 font-bold text-gray-800 group-hover:text-black">{product.title}</td>
-                                                <td className="px-8 py-5 text-gray-500 font-medium">${product.price}</td>
+                                                <td className="px-8 py-5 text-gray-600 font-semibold">${parseFloat(product.price).toFixed(2)}</td>
                                                 <td className="px-8 py-5">
                                                     <div className="flex justify-center gap-2">
-                                                        <button onClick={() => setSelectedProduct(product)} className="p-2 text-green-500 hover:bg-green-50 rounded-xl transition"><Info size={18}/></button>
-                                                        <button onClick={() => updateItem(product.id, {title: "Modified"})} className="p-2 text-blue-500 hover:bg-blue-50 rounded-xl transition"><Edit2 size={18}/></button>
-                                                        <button onClick={() => deleteItem(product.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition"><Trash2 size={18}/></button>
+                                                        <button onClick={() => setSelectedProduct(product)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition" title="View details"><Info size={18}/></button>
+                                                        <button onClick={() => handleEditProduct(product)} className="p-2 text-amber-600 hover:bg-amber-50 rounded-xl transition" title="Edit"><Edit2 size={18}/></button>
+                                                        <button onClick={() => handleDeleteProduct(product)} className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition" title="Delete"><Trash2 size={18}/></button>
                                                     </div>
                                                 </td>
                                             </tr>
-                                        ))}
+                                        )) : (
+                                            <tr><td colSpan="3" className="text-center py-12 text-gray-400">No products found</td></tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
@@ -251,7 +332,47 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {/* 2. Details Modal */}
+            {/* 2. Edit Product Modal */}
+            {showEditModal && editingProduct && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white w-full max-w-lg rounded-[32px] shadow-2xl p-8 relative">
+                        <button onClick={() => { setShowEditModal(false); setEditingProduct(null); }} className="absolute top-6 right-6 text-gray-400 hover:text-black transition-colors"><X size={24}/></button>
+                        <h2 className="text-3xl font-black mb-1 text-gray-900 leading-tight">Edit Product</h2>
+                        <p className="text-gray-500 mb-6 font-medium">Update product information</p>
+                        
+                        <form onSubmit={handleUpdateProduct} className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-gray-500 tracking-[0.2em] ml-1">Product Title</label>
+                                <input name="title" defaultValue={editingProduct.title} required className="w-full p-3 bg-gray-50 rounded-xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-black outline-none" />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-gray-500 tracking-[0.2em] ml-1">Price</label>
+                                    <input name="price" type="number" min={1} step="0.01" defaultValue={editingProduct.price} required className="w-full p-3 bg-gray-50 rounded-xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-black outline-none" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-gray-500 tracking-[0.2em] ml-1">Category</label>
+                                    <input name="category" defaultValue={editingProduct.category} required className="w-full p-3 bg-gray-50 rounded-xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-black outline-none" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-gray-500 tracking-[0.2em] ml-1">Description</label>
+                                <textarea name="description" defaultValue={editingProduct.description} className="w-full resize-none p-4 bg-gray-50 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-black outline-none h-24" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-gray-500 tracking-[0.2em] ml-1">Image URL</label>
+                                <input name="thumbnail" defaultValue={editingProduct.thumbnail} required className="w-full p-3 bg-gray-50 rounded-xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-black outline-none" />
+                            </div>
+                            <div className="flex gap-3 pt-2">
+                                <button type="button" onClick={() => { setShowEditModal(false); setEditingProduct(null); }} className="flex-1 bg-gray-100 text-black py-3 rounded-2xl font-bold hover:bg-gray-200 transition">Cancel</button>
+                                <button type="submit" className="flex-1 bg-black text-white py-3 rounded-2xl font-bold hover:bg-gray-800 shadow-lg active:scale-95 transition">Update Product</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* 3. Details Modal */}
             {selectedProduct && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
                     <div className="bg-white w-full max-w-4xl rounded-[48px] shadow-2xl overflow-hidden relative flex flex-col md:flex-row max-h-[90vh]">

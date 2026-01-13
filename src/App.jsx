@@ -8,12 +8,13 @@ import Contact from '../src/pages/Contact';
 import AdminDashboard from '../src/pages/AdminDashboard';
 // import ProtectedRoute from './components/ProtectedRoute';
 import { CartProvider } from './context/CartContext';
+import Wishlist from './pages/Wishlist';
+import Error from './pages/error';
 
 function App() {
   return (
     <CartProvider>
     <BrowserRouter>
-      {/* 1. Toaster is placed outside Routes so it's available everywhere */}
       <Toaster 
         position="top-right" 
         toastOptions={{
@@ -41,6 +42,8 @@ function App() {
         <Route path='/cart' element={<Cart />} />
         <Route path='/Contact' element={<Contact />} />
         <Route path='/AdminDashboard' element={<AdminDashboard />} />
+        <Route path='/wishlist' element={ <Wishlist />} />
+        <Route path='*' element={<Error/>}/>
       </Routes>
     </BrowserRouter>
     </CartProvider>
